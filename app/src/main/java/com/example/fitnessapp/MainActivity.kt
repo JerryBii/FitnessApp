@@ -7,6 +7,9 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,5 +25,35 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications))
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        fetchData()
+    }
+
+    fun fetchData() {
+        val url = "https://wger.de/api/v2/exercise/?language=2&limit=400"
+
+        val request = Request.Builder().url(url).build()
+
+        val client = OkHttpClient()
+        client.newCall(request).enqueue(object: Callback {
+            override fun onResponse(call: Call, response: Response){
+                val body = response?.body()?.string()
+                println(body)
+
+                val gson = GsonBuilder().create()
+                val homefeeed = gson.fromJson(body, Test::class.java)
+            }
+
+            override fun onFailure(call: Call?, e: IOException?){
+                println("Failed To fetch")
+            }
+        })
+
     }
 }
+
+class Test (val Test: List<Result>)
+
+class Result(val id: Int, val name: String)
+
+
