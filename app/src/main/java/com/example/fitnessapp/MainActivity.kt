@@ -7,8 +7,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import com.google.gson.GsonBuilder
+import okhttp3.*
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
@@ -36,24 +36,26 @@ class MainActivity : AppCompatActivity() {
 
         val client = OkHttpClient()
         client.newCall(request).enqueue(object: Callback {
-            override fun onResponse(call: Call, response: Response){
-                val body = response?.body()?.string()
+            override fun onResponse(call: Call, response: Response) {
+                val body = response.body?.string()
                 println(body)
 
                 val gson = GsonBuilder().create()
-                val homefeeed = gson.fromJson(body, Test::class.java)
+
+                val test = gson.fromJson(body, Test::class.java)
+            }
+            override fun onFailure(call: Call, e: IOException) {
+                println("Failed to fetch data")
+
             }
 
-            override fun onFailure(call: Call?, e: IOException?){
-                println("Failed To fetch")
-            }
         })
 
     }
 }
 
-class Test (val Test: List<Result>)
+class Test (val results: List<Results>)
 
-class Result(val id: Int, val name: String)
+class Results(val id: Int, val name: String)
 
 
